@@ -128,7 +128,9 @@
                   duration-150
                   ease-in-out
                 "
+                :disabled="isLoading"
               >
+                <LoadingSvg :loading="isLoading" />
                 Sign in
               </button>
             </span>
@@ -147,6 +149,7 @@ export default {
   },
   data() {
     return {
+      isLoading: false,
       credentials: {
         email: '',
         password: '',
@@ -163,14 +166,18 @@ export default {
   },
   methods: {
     async userLogin() {
+      this.isLoading = true
       try {
         await this.$auth
           .loginWith('local', { data: this.credentials })
           .then((res) => {
+            this.isLoading = true
             this.$router.push({ path: '/dashboard' })
           })
       } catch (err) {
         this.error = err.response.data.error
+        this.isLoading = false
+        console.log(err)
       }
     },
   },

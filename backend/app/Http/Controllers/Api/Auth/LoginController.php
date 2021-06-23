@@ -25,12 +25,13 @@ class LoginController extends Controller
         $data = $request->validated();
         $user = User::where('email', request('email'))->first();
 
-        abort_unless($user, 404, 'This combination does not exists.');
-        abort_unless(
-            \Hash::check(request('password'), $user->password),
-            403,
-            'This combination does not exists.'
-        );
+        if (!$user) {
+            return $this->sendResponseWithError('This combination does not exists.', $user, 404);
+        }
+
+        if (!\Hash::check(request('password'), $user->password)) {
+            return $this->sendResponseWithError('This combination does not exists.', $user, 403);
+        }
 
         $resp = $this->proxy->grantPasswordToken($data['email'], $data['password']);
 

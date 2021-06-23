@@ -12,11 +12,11 @@ export default {
       lang: 'en',
     },
     meta: [
-      { charset: 'utf-8' },
-      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { hid: 'description', name: 'description', content: '' },
+      {charset: 'utf-8'},
+      {name: 'viewport', content: 'width=device-width, initial-scale=1'},
+      {hid: 'description', name: 'description', content: ''},
     ],
-    link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
+    link: [{rel: 'icon', type: 'image/x-icon', href: '/favicon.ico'}],
   },
 
   // Global CSS: https://go.nuxtjs.dev/config-css
@@ -64,14 +64,17 @@ export default {
         },
         endpoints: {
           login: {
-            url: 'http://backend_pms.test/api/v1/login',
+            url: process.env.BASE_API_URL + '/login',
             method: 'post',
           },
           logout: {
-            url: 'http://backend_pms.test/api/v1/logout',
+            url: process.env.BASE_API_URL + '/logout',
             method: 'post',
           },
-          user: { url: 'http://backend_pms.test/api/v1/user', method: 'get' },
+          user: {
+            url: process.env.BASE_API_URL + '/user',
+            method: 'get',
+          },
         },
       },
     },
@@ -79,7 +82,10 @@ export default {
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {
-    baseURL: 'http://backend_pms.test/api/v1',
+    baseURL: process.env.BASE_API_URL,
+    common: {
+      Accept: 'application/json',
+    },
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build

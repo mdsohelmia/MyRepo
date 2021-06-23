@@ -311,6 +311,7 @@ export default {
       page: 1,
       open: false,
       projects: [],
+      keywords: '',
       data: [],
       filter: {
         from_date: null,

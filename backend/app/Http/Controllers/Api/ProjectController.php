@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProjectCreateRequest;
 use App\Http\Resources\ProjectCollection;
+use App\Http\Resources\ProjectResource;
 use App\Services\ProjectService;
+use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class ProjectController extends Controller
 {
@@ -19,16 +21,24 @@ class ProjectController extends Controller
         $this->projectService = $projectService;
     }
 
-    public function index(): ProjectCollection
+    public function index()
     {
-        return (new ProjectCollection($this->projectService->projectList()))->additional([
-            'success' => true,
-            'message' => 'All project',
-        ]);
+        try {
+            return (new ProjectCollection($this->projectService->projectList()))->additional([
+                'success' => true,
+                'message' => 'All project',
+            ]);
+        } catch (\Throwable $exception) {
+            return $this->sendResponseWithError($exception->getMessage(), '', $exception->getCode());
+        }
     }
 
     public function store(ProjectCreateRequest $request)
     {
-        return  $this->projectService->create($request->validated());
+        try {
+            return new ProjectResource($this->projectService->create($request->validated()));
+        } catch (\Throwable $exception) {
+            return $this->sendResponseWithError($exception->getMessage(), '', $exception->getCode());
+        }
     }
 }

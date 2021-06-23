@@ -91,6 +91,11 @@
                   </template>
                 </Multiselect>
               </div>
+              <span
+                v-if="hasErrors('workspace_id')"
+                class="text-red-500 mt-1 text-xs"
+                >{{ errors.workspace_id[0] }}</span
+              >
             </div>
             <div>
               <label
@@ -119,8 +124,13 @@
                     ease-in-out
                     sm:text-sm sm:leading-5
                   "
-                  placeholder="you@example.com"
+                  placeholder="project title"
                 />
+                <span
+                  v-if="hasErrors('title')"
+                  class="text-red-500 mt-1 text-xs"
+                  >{{ errors.title[0] }}</span
+                >
               </div>
             </div>
             <div>
@@ -152,6 +162,11 @@
                     sm:text-sm sm:leading-5
                   "
                 />
+                <span
+                  v-if="hasErrors('start_date')"
+                  class="text-red-500 mt-1 text-xs"
+                  >{{ errors.start_date[0] }}</span
+                >
               </div>
             </div>
             <div>
@@ -182,8 +197,12 @@
                     ease-in-out
                     sm:text-sm sm:leading-5
                   "
-                  placeholder="you@example.com"
                 />
+                <span
+                  v-if="hasErrors('deadline')"
+                  class="text-red-500 mt-1 text-xs"
+                  >{{ errors.deadline[0] }}</span
+                >
               </div>
             </div>
             <div>
@@ -202,6 +221,11 @@
                     <strong>{{ option.name }}</strong>
                   </template>
                 </Multiselect>
+                <span
+                  v-if="hasErrors('members')"
+                  class="text-red-500 mt-1 text-xs"
+                  >{{ errors.members[0] }}</span
+                >
               </div>
             </div>
           </div>
@@ -209,7 +233,7 @@
             <button
               type="button"
               class="
-                w-full
+                w-64
                 inline-flex
                 justify-center
                 rounded-md
@@ -228,8 +252,10 @@
                 focus:ring-red-500
                 sm:ml-3 sm:w-auto sm:text-sm
               "
+              :disabled="isLoading"
               @click="createProject"
             >
+              <LoadingSvg :loading="isLoading" />
               Create
             </button>
             <button
@@ -268,18 +294,21 @@
 
 <script>
 import Multiselect from 'vue-multiselect'
+import LoadingSvg from './LoadingSvg'
 
 export default {
   name: 'Modal',
   components: {
+    LoadingSvg,
     Multiselect,
   },
   props: ['isOpen'],
   data() {
     return {
+      isLoading: false,
       members: [],
       workspaces: [],
-      errors: [],
+      errors: null,
       workspace: '',
       form: {
         title: '',
@@ -319,14 +348,23 @@ export default {
         })
     },
     createProject() {
+      this.isLoading = true
       this.$axios
         .post('/projects', this.form)
         .then((res) => {
-
+          this.isLoading = false
+          this.close()
         })
         .catch((error) => {
-          console.log(error)
+          this.errors = error.response.data.errors
+          this.isLoading = false
         })
+    },
+    hasErrors(field) {
+      if (this.errors !== null) {
+        return field in this.errors
+      }
+      return false
     },
   },
 }
